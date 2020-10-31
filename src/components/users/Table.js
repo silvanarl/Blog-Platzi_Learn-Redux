@@ -1,12 +1,18 @@
 import React from "react";
 import { connect } from 'react-redux';
+import  { Link } from 'react-router-dom';
 
 const Table = (props) => {
-  const generatorRows = () => props.users.map((user) => (
+  const generatorRows = () => props.users.map((user, key) => (
       <tr key={user.id}>
         <td>{user.name}</td>
         <td>{user.email}</td>
         <td>{user.website}</td>
+        <td>
+            <Link to={ `/publications/${key}` }>
+                <div className="eye-solid3 icon"></div>
+            </Link>
+        </td>
       </tr>
     ));
   return (
@@ -16,6 +22,7 @@ const Table = (props) => {
           <th>Nombre</th>
           <th>Correo</th>
           <th>Enlace</th>
+          
         </tr>
       </thead>
       <tbody>{generatorRows()}</tbody>
