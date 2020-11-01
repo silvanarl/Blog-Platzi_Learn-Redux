@@ -8,7 +8,7 @@ import * as usersActions from '../../actions/usersActions';
 import * as publicActions from '../../actions/publicActions';
 
 const { getAll: usersGetAll } = usersActions;
-const { getByUser: publicGetByUser, openClose } = publicActions;
+const { getByUser: publicGetByUser, openClose, getComments } = publicActions;
 
 class Publications extends Component {
     async componentDidMount() {
@@ -76,24 +76,29 @@ class Publications extends Component {
     }
 
     showInfo = (posts, postsKey) => (
-        posts.map((post, commentsKey) => (
+        posts.map((post, commentKey) => (
             <div 
                 key={post.id}
                 className="post-title"
-                onClick={() => this.props.openClose(postsKey, commentsKey)}
+                onClick={
+                    () => this.showComments(postsKey, commentKey, post.comments)
+                }
             >
                 <h2>{post.title}</h2>
                 <p>{post.body}</p>
                 {
-                    (post.open) ? <Comments /> : ''
+                    (post.open) ? <Comments comments={post.comments} /> : ''
                 }
             </div>
         ))
     );
 
-    // showComments = () => {
-
-    // };
+    showComments = (postsKey, commentKey, comments) => {
+        this.props.openClose(postsKey, commentKey);
+        if(!comments.length){
+            this.props.getComments(postsKey, commentKey);
+        }
+    };
     
     render(){
         {console.log(this.props)}
@@ -117,6 +122,7 @@ const mapDispatchToProps = {
     usersGetAll,
     publicGetByUser,
     openClose,
+    getComments,
 }
 export default connect(mapStateToProps, mapDispatchToProps)(Publications);
 

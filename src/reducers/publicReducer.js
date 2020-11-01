@@ -1,9 +1,19 @@
-import { UPDATE, LOADING, ERROR } from '../types/postsTypes'
+import {
+    UPDATE,
+    LOADING, 
+    ERROR, 
+    COMMENTS_ERROR,
+    COMMENTS_LOADING,
+    COMMENTS_UPDATE
+ } from '../types/postsTypes'
 
 const INITIAL_STATE = {
   posts: [],
   loading: false,
   error: '',
+  comments_loading: false,
+  comments_error: '',
+
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -19,7 +29,18 @@ export default (state = INITIAL_STATE, action) => {
         return {...state, loading: true};
     case ERROR:
         return {...state, error: action.payload, loading: false};
-    default:
+    case COMMENTS_LOADING:
+        return {...state, comments_loading: true};
+    case COMMENTS_ERROR:
+        return {...state, comments_error: action.payload, comments_loading: false};
+    case COMMENTS_UPDATE:
+        return {
+            ...state,
+            posts: action.payload,
+            comments_loading: false,
+            comments_error: '',
+        };
+        default:
       return state;
   }
 };

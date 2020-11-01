@@ -26,4 +26,9 @@ body{
 }
 .post-title{
   border-top: 1px solid #000;
+  cursor: pointer;
+}
+li{
+  margin: 15px 0px;
+  list-style: none;
 }
