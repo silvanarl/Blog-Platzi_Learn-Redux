@@ -1,25 +1,106 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import Spinner from '../general/Spinner';
+import Fatal from '../general/Fatal';
+import Comments from './Comments';
+
 import * as usersActions from '../../actions/usersActions';
 import * as publicActions from '../../actions/publicActions';
 
 const { getAll: usersGetAll } = usersActions;
-const { getByUser: publicGetByUser } = publicActions;
+const { getByUser: publicGetByUser, openClose } = publicActions;
 
 class Publications extends Component {
     async componentDidMount() {
-        if(!this.props.usersReducer.users.lenght){ //especificar de que reducer traemos los datos
-            await this.props.usersGetAll();
+        const {
+            usersGetAll,
+            publicGetByUser,
+            match: { params : { key }}
+        } = this.props;
+
+        if(!this.props.usersReducer.users.length){ //especificar de que reducer traemos los datos
+            await usersGetAll();
         }
-        this.props.publicGetByUser(this.props.match.params.key);
+        if(this.props.usersReducer.error){
+            return ;
+        }
+        if(!('postsKey' in this.props.usersReducer.users[key])){
+            publicGetByUser(key);
+        }
     }
 
+    putUser = () => {
+        console.log(this.props);
+        const { 
+            usersReducer,
+            match: { params: { key } }
+        } = this.props;
+        if(usersReducer.error){
+            <Fatal message={usersReducer.error} />
+        }
+        if(!usersReducer.users.length || usersReducer.loading){
+            <Spinner />
+        }
+        const name = usersReducer.users[key].name;
+        return (
+            <h1>Publicaciones de {name} </h1>
+        )
+    };
+
+    putPosts = () => {
+        const { 
+            usersReducer,
+            usersReducer: { users },
+            publicReducer,
+            publicReducer: { posts },
+            match: { params : { key }}
+        } = this.props;
+
+        if(!users.length) return ;
+        if(usersReducer.error) return;
+        if(publicReducer.loading){
+            return <Spinner />
+        }
+        if(publicReducer.error){
+            return <Fatal message={publicReducer.error} />
+        }
+        if(!posts.length) return;
+        if(!('postsKey' in users[key])) return;
+
+        const { postsKey } = users[key];
+
+        return this.showInfo(
+            posts[postsKey], 
+            postsKey
+        )
+    }
+
+    showInfo = (posts, postsKey) => (
+        posts.map((post, commentsKey) => (
+            <div 
+                key={post.id}
+                className="post-title"
+                onClick={() => this.props.openClose(postsKey, commentsKey)}
+            >
+                <h2>{post.title}</h2>
+                <p>{post.body}</p>
+                {
+                    (post.open) ? <Comments /> : ''
+                }
+            </div>
+        ))
+    );
+
+    // showComments = () => {
+
+    // };
+    
     render(){
         {console.log(this.props)}
         return (
-            <div>
-                <h1>Publicaciones de: </h1>
-                {this.props.match.params.key}
+            <div> 
+                {this.putUser() }
+                {this.putPosts()}
             </div>
         )
     }
@@ -35,6 +116,7 @@ const mapStateToProps = ({ usersReducer, publicReducer }) => {
 const mapDispatchToProps = {
     usersGetAll,
     publicGetByUser,
+    openClose,
 }
 export default connect(mapStateToProps, mapDispatchToProps)(Publications);
 

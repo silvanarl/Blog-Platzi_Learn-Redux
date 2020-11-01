@@ -1,5 +1,4 @@
 import React from 'react';
-//import '../../css/spinner.css';
 
 const Fatal = (props) => {
     {console.log(props)}

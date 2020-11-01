@@ -1,3 +1,3 @@
-export const GET_BY_USER = 'posts_get_by_user';
+export const UPDATE = 'post_update';
 export const LOADING = 'posts_loading';
 export const ERROR = 'posts_error'; 
